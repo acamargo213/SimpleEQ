@@ -54,13 +54,21 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //second line this function provides list of all parameters when created
-    static juce::AudioProcessorValueTreeState:::ParameterLayout
+    static juce::AudioProcessorValueTreeState::ParameterLayout
         createParameterLayout();
     //first line from video - creating audio parameter (~18:20)
-    juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters",  createParameterLayout() }; 
-}
+    juce::AudioProcessorValueTreeState apvts { *this, nullptr, "Parameters",  createParameterLayout()}; 
+
 
 private:
+    using Filter = juce::dsp::IIR::Filter<float>;
+
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+    MonoChain leftChain, rightChain;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
 };
